@@ -61,6 +61,14 @@ app.get("/u/:shortURL", (req, res) =>{
   res.redirect(`${urlDatabase[shortURL]}`)
 });
 
+//POST request to delete a URL stored in the database
+app.post(`/urls/:shortURL/delete`, (req, res) => {
+  const shortURL = req.params.shortURL
+  delete urlDatabase[shortURL];
+  res.redirect("/urls/");
+  console.log(urlDatabase);
+});
+
 //Shows the URL database in JSON
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
