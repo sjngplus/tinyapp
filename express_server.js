@@ -23,25 +23,31 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
-
+//Root page of the app
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
+//Shows all URL lists in the database
 app.get("/urls", (req, res) => {
   const templateVars = {urls: urlDatabase};
   res.render("urls_index", templateVars);
 });
 
+//Shows the page where a new TinyURL can be generated
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
+//A POST request to generate a short URL for the user submitted long URL. Saves the new long url and short URL into the databse
 app.post("/urls", (req, res) => {
-  console.log(req.body);
-  res.send(generateRandomString(6));
+  const randomString = generateRandomString(6);
+  res.redirect(`/urls/${randomString}`)
+  urlDatabase[randomString] = `http://${req.body.longURL}`;
+  console.log(urlDatabase);
 });
 
+//Shows a the single URL that was listed in the GET URL request.
 app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const longURL = urlDatabase[shortURL];
@@ -49,11 +55,18 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+//Redirects to the long URL when short URL is clicked
+app.get("/u/:shortURL", (req, res) =>{
+  const shortURL = req.params.shortURL
+  res.redirect(`${urlDatabase[shortURL]}`)
+});
 
+//Shows the URL database in JSON
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
+//Test
 app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
