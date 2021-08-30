@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/sjngplus/tinyapp/issues"
   },
-  "homepage": "https://github.com/sjngplus/tinyapp#readme"
+  "homepage": "https://github.com/sjngplus/tinyapp#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
