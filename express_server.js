@@ -1,3 +1,10 @@
+/*
+const morgan = require('morgan');
+// morgan middleware allows to log the request in the terminal
+app.use(morgan('short'));
+*/
+
+//Generate a randomstring of x length
 const generateRandomString = function(stringLength) {
   let result = '';
   const alphaNumChar = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
@@ -8,38 +15,45 @@ const generateRandomString = function(stringLength) {
   return result;
 };
 
+
+//Setting up the express server
 const express = require('express');
 const app = express();
 const PORT = 8080;
 
+//Setting the view engine to ejs.
 app.set('view engine', 'ejs');
 
-const bodyParser = require('body-parser');
-app.use(bodyParser.urlencoded({extended: true}));
+// const bodyParser = require('body-parser'); ##Depracated. No need to use##
+// app.use(bodyParser.urlencoded({extended: true})); ##Depracated. No need to use##
+app.use(express.urlencoded({extended: true}));
 
-
+//URL database
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "Asm5xK": "http://www.google.com"
 };
 
-//Root page of the app
+
+//##ENDPOINTS/ROUTES BELOW##
+
+//Redirect to /urls page
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  res.redirect("/urls");
 });
 
-//Shows all URL lists in the database
+//Renders all URL lists in the database
 app.get("/urls", (req, res) => {
   const templateVars = {urls: urlDatabase};
   res.render("urls_index", templateVars);
 });
 
-//Shows the page where a new TinyURL can be generated
+//Renders the create new page
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
-//A POST request to generate a short URL for the user submitted long URL. Saves the new long url and short URL into the databse
+//A POST request to save a new short and long URL into the URL database
 app.post("/urls", (req, res) => {
   const randomString = generateRandomString(6);
   res.redirect(`/urls/${randomString}`)
@@ -47,7 +61,7 @@ app.post("/urls", (req, res) => {
   console.log(urlDatabase);
 });
 
-//Shows a the single URL that was listed in the GET URL request.
+//Renders the urls_show page and lists the requested short and long URL
 app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const longURL = urlDatabase[shortURL];
@@ -55,7 +69,7 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-//POST request to update an existing longURL in the database
+//POST request to update an existing longURL in the URL database
 app.post("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const newLongURL = `http://${req.body.newLongURL}`;
@@ -64,13 +78,13 @@ app.post("/urls/:shortURL", (req, res) => {
   console.log(urlDatabase);
 });
 
-//Redirects to the long URL when short URL is clicked
+//Redirects to the long URL website when the short URL link is clicked
 app.get("/u/:shortURL", (req, res) =>{
   const shortURL = req.params.shortURL
   res.redirect(`${urlDatabase[shortURL]}`)
 });
 
-//POST request to delete a URL stored in the database
+//POST request to delete URL stored in the URL database
 app.post(`/urls/:shortURL/delete`, (req, res) => {
   const shortURL = req.params.shortURL
   delete urlDatabase[shortURL];
@@ -78,7 +92,7 @@ app.post(`/urls/:shortURL/delete`, (req, res) => {
   console.log(urlDatabase);
 });
 
-//Shows the URL database in JSON
+//Sends the URL database in JSON to the client
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
@@ -89,6 +103,13 @@ app.get("/hello", (req, res) => {
 });
 
 
+
+
+
+
+
+
+//Server listeneing to PORT
 app.listen(PORT, () => {
   console.log("Server is listening on port", PORT);
 });
