@@ -22,9 +22,12 @@ app.use(morgan('short'));
 //Setting the view engine to ejs.
 app.set('view engine', 'ejs');
 
-// const bodyParser = require('body-parser'); ##Depracated. No need to use##
-// app.use(bodyParser.urlencoded({extended: true})); ##Depracated. No need to use##
+//Replaces body-parser. Middleware to parse client form requests/data
 app.use(express.urlencoded({extended: true}));
+
+//Setting up cookie-parser middleware to use cookies
+const cookie = require('cookie-parser');
+app.use(cookie());
 
 //URL database
 const urlDatabase = {
@@ -42,13 +45,23 @@ app.get("/", (req, res) => {
 
 //Renders all URL lists in the database
 app.get("/urls", (req, res) => {
-  const templateVars = {urls: urlDatabase};
+  const clientCookie = req.cookies;
+  const clientUserName = clientCookie.username
+  const templateVars = {
+    urls: urlDatabase,
+    username: clientUserName
+  };
   res.render("urls_index", templateVars);
 });
 
 //Renders the create new page
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  const clientCookie = req.cookies;
+  const clientUserName = clientCookie.username
+  const templateVars = {
+    username: clientUserName
+  };
+  res.render("urls_new", templateVars);
 });
 
 //A POST request to save a new short and long URL into the URL database
@@ -63,7 +76,13 @@ app.post("/urls", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const longURL = urlDatabase[shortURL];
-  const templateVars = { shortURL, longURL}
+  const clientCookie = req.cookies;
+  const clientUserName = clientCookie.username  
+  const templateVars = { 
+    shortURL, 
+    longURL,
+    username: clientUserName
+  }
   res.render("urls_show", templateVars);
 });
 
@@ -88,6 +107,14 @@ app.post(`/urls/:shortURL/delete`, (req, res) => {
   delete urlDatabase[shortURL];
   res.redirect("/urls/");
   console.log(urlDatabase);
+});
+
+//POST request for user login
+app.post("/logins", (req, res) => {
+  const userName = req.body.username;
+  res.cookie("username", userName);
+  res.redirect("/urls");
+  console.log(cookie);
 });
 
 //Sends the URL database in JSON to the client
