@@ -69,7 +69,6 @@ app.post("/urls", (req, res) => {
   const randomString = generateRandomString(6);
   res.redirect(`/urls/${randomString}`)
   urlDatabase[randomString] = `http://${req.body.longURL}`;
-  console.log(urlDatabase);
 });
 
 //Renders the urls_show page and lists the requested short and long URL
@@ -92,7 +91,6 @@ app.post("/urls/:shortURL", (req, res) => {
   const newLongURL = `http://${req.body.newLongURL}`;
   urlDatabase[shortURL] = newLongURL;
   res.redirect(`/urls/${shortURL}`);
-  console.log(urlDatabase);
 });
 
 //Redirects to the long URL website when the short URL link is clicked
@@ -106,7 +104,6 @@ app.post(`/urls/:shortURL/delete`, (req, res) => {
   const shortURL = req.params.shortURL
   delete urlDatabase[shortURL];
   res.redirect("/urls/");
-  console.log(urlDatabase);
 });
 
 //POST request for user login
@@ -114,7 +111,12 @@ app.post("/logins", (req, res) => {
   const userName = req.body.username;
   res.cookie("username", userName);
   res.redirect("/urls");
-  console.log(cookie);
+});
+
+//POST request for user logout
+app.post("/logout", (req, res) => {
+  res.clearCookie("username");
+  res.redirect("/urls");
 });
 
 //Sends the URL database in JSON to the client
