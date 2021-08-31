@@ -1,9 +1,3 @@
-/*
-const morgan = require('morgan');
-// morgan middleware allows to log the request in the terminal
-app.use(morgan('short'));
-*/
-
 //Generate a randomstring of x length
 const generateRandomString = function(stringLength) {
   let result = '';
@@ -20,6 +14,10 @@ const generateRandomString = function(stringLength) {
 const express = require('express');
 const app = express();
 const PORT = 8080;
+
+// morgan middleware allows to log the request in the terminal
+const morgan = require('morgan');
+app.use(morgan('short'));
 
 //Setting the view engine to ejs.
 app.set('view engine', 'ejs');
@@ -101,11 +99,6 @@ app.get("/urls.json", (req, res) => {
 app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
-
-
-
-
-
 
 
 
