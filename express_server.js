@@ -20,7 +20,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "Asm5xK": "http://www.google.com"
 };
 
 //Root page of the app
@@ -53,6 +53,15 @@ app.get("/urls/:shortURL", (req, res) => {
   const longURL = urlDatabase[shortURL];
   const templateVars = { shortURL, longURL}
   res.render("urls_show", templateVars);
+});
+
+//POST request to update an existing longURL in the database
+app.post("/urls/:shortURL", (req, res) => {
+  const shortURL = req.params.shortURL;
+  const newLongURL = `http://${req.body.newLongURL}`;
+  urlDatabase[shortURL] = newLongURL;
+  res.redirect(`/urls/${shortURL}`);
+  console.log(urlDatabase);
 });
 
 //Redirects to the long URL when short URL is clicked
