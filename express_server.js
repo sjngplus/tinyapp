@@ -56,7 +56,12 @@ const usersDatabase= {
     id: "f56g23kl", 
     email: "user2@example.com", 
     password: "dishwasher-funk"
-  }
+  },
+  "nk457fqp": {
+    id: "nk457fqp",
+    email: "test@example.com",
+    password: "test"
+  } 
 }
 
 
@@ -89,18 +94,24 @@ app.get("/urls/new", (req, res) => {
   let user = "";
   if (clientUserId) {
     user = usersDatabase[clientUserId];
+    const templateVars = {
+      user
+    };
+    return res.render("urls_new", templateVars);
   }
-  const templateVars = {
-    user
-  };
-  res.render("urls_new", templateVars);
+  res.redirect("/login");
 });
 
 //A POST request to save a new short and long URL into the URL database
 app.post("/urls", (req, res) => {
-  const randomString = generateRandomString(6);
-  res.redirect(`/urls/${randomString}`)
-  urlDatabase[randomString] = `http://${req.body.longURL}`;
+  const clientCookie = req.cookies;
+  const clientUserId = clientCookie.user_id;
+  if(clientUserId) {
+    const randomString = generateRandomString(6);
+    urlDatabase[randomString] = `http://${req.body.longURL}`;
+    return res.redirect(`/urls/${randomString}`);
+  }
+  res.status(401).send("User login required to access services");
 });
 
 //Renders the urls_show page and lists the requested short and long URL
