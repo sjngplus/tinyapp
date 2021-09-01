@@ -1,3 +1,4 @@
+//##HELPER FUNCTIONS##
 //Generate a randomstring of x length
 const generateRandomString = function(stringLength) {
   let result = '';
@@ -8,6 +9,15 @@ const generateRandomString = function(stringLength) {
   }
   return result;
 };
+//Check for existing email and return user info
+const lookupUserByEmail = function(email, database) {
+  for (const user in database) {
+    if (email === database[user].email) {
+      return database[user];
+    }
+  }
+  return false;
+};
 
 
 //Setting up the express server
@@ -16,8 +26,8 @@ const app = express();
 const PORT = 8080;
 
 // morgan middleware allows to log the request in the terminal
-const morgan = require('morgan');
-app.use(morgan('short'));
+// const morgan = require('morgan');
+// app.use(morgan('short'));
 
 //Setting the view engine to ejs.
 app.set('view engine', 'ejs');
@@ -37,13 +47,13 @@ const urlDatabase = {
 
 //User database
 const usersDatabase= { 
-  "userRandomID": {
-    id: "userRandomID", 
+  "Fg458f34": {
+    id: "Fg458f34", 
     email: "user@example.com", 
     password: "purple-monkey-dinosaur"
   },
- "user2RandomID": {
-    id: "user2RandomID", 
+ "f56g23kl": {
+    id: "f56g23kl", 
     email: "user2@example.com", 
     password: "dishwasher-funk"
   }
@@ -161,14 +171,20 @@ app.get("/register", (req, res) => {
 
 //POST request for new user registration
 app.post("/register", (req, res) => {
-  const userEmail = req.body.email;
-  const userPassword = req.body.password;
-  
+  const newUserEmail = req.body.email;
+  const newUserPassword = req.body.password;
+  if (!newUserEmail || !newUserPassword) {
+    return res.status(400).send("Please enter valid credentials");
+  }
+  const userInDatabase = lookupUserByEmail(newUserEmail, usersDatabase);
+  if (userInDatabase) {
+    return res.status(400).send("Email is registered already. Please use new email")
+  }
   const randomString = generateRandomString(8);
   usersDatabase[randomString] = {
     id: randomString,
-    email: userEmail,
-    password: userPassword
+    email: newUserEmail,
+    password: newUserPassword
   };
   res.cookie("user_id", randomString);
   res.redirect("/urls");
@@ -177,10 +193,13 @@ app.post("/register", (req, res) => {
 
 
 
-
-
-//##TESTS and test endpoints##
-//console.log(JSON.stringify(usersDatabase, 0, 2));
+//##TESTS AND TEST ENPOINTS##
+app.get("/test", (req, res) => {
+  // console.log(JSON.stringify(usersDatabase, 0, 2));
+  // console.log(JSON.stringify(urlDatabase, 0, 2));
+  console.log(lookupUserByEmail("user@example.com", usersDatabase));
+  res.status(400).send("Error");
+});
 
 app.get("/urlDatabase.json", (req, res) => {
   res.json(urlDatabase);
@@ -190,9 +209,6 @@ app.get("/usersDatabase.json", (req, res) => {
   res.json(usersDatabase);
 });
 
-app.get("/test", (req, res) => {
-  res.status(400).send("Error");
-});
 
 //Server listening to PORT
 app.listen(PORT, () => {
