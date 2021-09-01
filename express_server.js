@@ -119,6 +119,16 @@ app.post("/logout", (req, res) => {
   res.redirect("/urls");
 });
 
+//Renders the user registration page
+app.get("/register", (req, res) => {
+  const clientCookie = req.cookies;
+  const clientUserName = clientCookie.username  
+  const templateVars = { 
+    username: clientUserName
+  }
+  res.render("urls_register", templateVars)
+});
+
 //Sends the URL database in JSON to the client
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
