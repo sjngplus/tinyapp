@@ -167,10 +167,13 @@ app.get("/urls/:shortURL", (req, res) => {
 app.post("/urls/:shortURL", (req, res) => {
   const clientCookie = req.cookies;
   const clientUserId = clientCookie.user_id;
-  const shortURL = req.params.shortURL;
-  const newLongURL = `http://${req.body.newLongURL}`;
-  urlDatabase[shortURL].longURL = newLongURL;
-  res.redirect(`/urls/${shortURL}`);
+  if (clientUserId) {
+    const shortURL = req.params.shortURL;
+    const newLongURL = `http://${req.body.newLongURL}`;
+    urlDatabase[shortURL].longURL = newLongURL;
+    return res.redirect(`/urls/${shortURL}`);
+  }
+  res.status(401).send("User login required to access services");
 });
 
 //Redirects to the long URL website when the short URL link is clicked
@@ -183,9 +186,14 @@ app.get("/u/:shortURL", (req, res) =>{
 
 //POST request to delete URL stored in the URL database
 app.post(`/urls/:shortURL/delete`, (req, res) => {
-  const shortURL = req.params.shortURL
-  delete urlDatabase[shortURL];
-  res.redirect("/urls/");
+  const clientCookie = req.cookies;
+  const clientUserId = clientCookie.user_id;
+  if (clientUserId) {
+    const shortURL = req.params.shortURL
+    delete urlDatabase[shortURL];
+    return res.redirect("/urls/");
+  }
+  res.status(401).send("User login required to access services");
 });
 
 //Renders the user registration page
