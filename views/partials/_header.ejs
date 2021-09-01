@@ -12,19 +12,24 @@
     </div>
     <% if (!user) { %>       
     <div>
-      <form class="form-inline" action="/logins" method="POST">
+
+      <form class="form-check form-check-inline" action="/login" method="GET">
         <div class="form-group mb-2">
-          <p style="font-weight: 600; margin-bottom: 0px;"></p>
-          <input class="form-control" type="text" name="user.email" placeholder="user.email" style="width: 300px; margin: 1em">
           <button type="submit" class="btn btn-primary">Login</button>
         </div>
       </form>
+
+      <form class="form-check form-check-inline" action="/register" method="GET">
+        <div class="form-group mb-2">
+          <button type="submit" class="btn btn-primary">Register</button>
+        </div>
+      </form>
+
     </div>
     <% } else { %> 
       <div>
-        <form class="form-inline" action="/logout" method="POST">
+        <form class="form-check form-check-inline" action="/logout" method="POST">
           <div class="form-group mb-2">
-            <p style="font-weight: 600; margin: 5px; margin-right: 20px;">Logged In As: <%= user.email %>!</p>
             <button type="submit" class="btn btn-primary">Logout</button>
           </div>
         </form>
