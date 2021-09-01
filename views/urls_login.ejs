@@ -7,7 +7,7 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
 
-    <title>Create Account</title>
+    <title>User Login</title>
   </head>
 
   <body>
@@ -16,15 +16,15 @@
     <!-- <header> -->
       
     <main style="margin: 1em;">
-      <h3>Create Account</h3>
-      <form action="/register" method="POST">
+      <h3>Login</h3>
+      <form action="/login" method="POST">
         <div class="form-group">
           <label for="email">Email address:</label>
-          <input class="form-control" type="email" name="email" placeholder="Enter email" style="width: 300px; margin-bottom: 12px;">
+          <input class="form-control" type="email" name="email" placeholder="Enter email" style="width: 300px; margin-bottom: 12px">
           <label for="password">Password:</label>
           <input class="form-control" type="password" name="password" placeholder="Password" style="width: 300px;">
         </div>
-        <button type="submit" class="btn btn-primary">Register</button>
+        <button type="submit" class="btn btn-primary">Login</button>
       </form>
     </main>
 

@@ -190,6 +190,20 @@ app.post("/register", (req, res) => {
   res.redirect("/urls");
 });
 
+//Renders the user login page
+app.get("/login", (req, res) => {
+  const clientCookie = req.cookies;
+  const clientUserId = clientCookie.user_id
+  let user = "";
+  if (clientUserId) {
+    user = usersDatabase[clientUserId];
+  }
+  const templateVars = {
+    user
+  };
+  res.render("urls_login", templateVars);
+});
+
 
 
 
