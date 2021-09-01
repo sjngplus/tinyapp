@@ -69,7 +69,6 @@ app.get("/urls", (req, res) => {
     urls: urlDatabase,
     user
   };
-  console.log(JSON.stringify(usersDatabase, 0, 2));
   res.render("urls_index", templateVars);
 });
 
@@ -164,6 +163,7 @@ app.get("/register", (req, res) => {
 app.post("/register", (req, res) => {
   const userEmail = req.body.email;
   const userPassword = req.body.password;
+  
   const randomString = generateRandomString(8);
   usersDatabase[randomString] = {
     id: randomString,
@@ -174,17 +174,25 @@ app.post("/register", (req, res) => {
   res.redirect("/urls");
 });
 
-//Sends the URL database in JSON to the client
-app.get("/urls.json", (req, res) => {
+
+
+
+
+
+//##TESTS and test endpoints##
+//console.log(JSON.stringify(usersDatabase, 0, 2));
+
+app.get("/urlDatabase.json", (req, res) => {
   res.json(urlDatabase);
 });
 
-//Test
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
+app.get("/usersDatabase.json", (req, res) => {
+  res.json(usersDatabase);
 });
 
-
+app.get("/test", (req, res) => {
+  res.status(400).send("Error");
+});
 
 //Server listening to PORT
 app.listen(PORT, () => {
