@@ -60,20 +60,29 @@ app.get("/", (req, res) => {
 //Renders all URL lists in the database
 app.get("/urls", (req, res) => {
   const clientCookie = req.cookies;
-  const clientUserName = clientCookie.username
+  const clientUserId = clientCookie.user_id
+  let user = "";
+  if (clientUserId) {
+    user = usersDatabase[clientUserId];
+  }
   const templateVars = {
     urls: urlDatabase,
-    username: clientUserName
+    user
   };
+  console.log(JSON.stringify(usersDatabase, 0, 2));
   res.render("urls_index", templateVars);
 });
 
 //Renders the create new page
 app.get("/urls/new", (req, res) => {
   const clientCookie = req.cookies;
-  const clientUserName = clientCookie.username
+  const clientUserId = clientCookie.user_id
+  let user = "";
+  if (clientUserId) {
+    user = usersDatabase[clientUserId];
+  }
   const templateVars = {
-    username: clientUserName
+    user
   };
   res.render("urls_new", templateVars);
 });
@@ -90,11 +99,15 @@ app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const longURL = urlDatabase[shortURL];
   const clientCookie = req.cookies;
-  const clientUserName = clientCookie.username  
+  const clientUserId = clientCookie.user_id;
+  let user = "";
+  if (clientUserId) {
+    user = usersDatabase[clientUserId];
+  } 
   const templateVars = { 
     shortURL, 
     longURL,
-    username: clientUserName
+    user
   }
   res.render("urls_show", templateVars);
 });
@@ -129,17 +142,21 @@ app.post("/logins", (req, res) => {
 
 //POST request for user logout
 app.post("/logout", (req, res) => {
-  res.clearCookie("username");
+  res.clearCookie("user_id");
   res.redirect("/urls");
 });
 
 //Renders the user registration page
 app.get("/register", (req, res) => {
   const clientCookie = req.cookies;
-  const clientUserName = clientCookie.username  
-  const templateVars = { 
-    username: clientUserName
+  const clientUserId = clientCookie.user_id
+  let user = "";
+  if (clientUserId) {
+    user = usersDatabase[clientUserId];
   }
+  const templateVars = {
+    user
+  };
   res.render("urls_register", templateVars)
 });
 
@@ -154,7 +171,6 @@ app.post("/register", (req, res) => {
     password: userPassword
   };
   res.cookie("user_id", randomString);
-  console.log(JSON.stringify(usersDatabase, 0, 2));
   res.redirect("/urls");
 });
 
