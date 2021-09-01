@@ -41,8 +41,18 @@ app.use(cookie());
 
 //URL database
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "Asm5xK": "http://www.google.com"
+  "b2xVn2": {
+    longURL: "http://www.lighthouselabs.ca",
+    userID: "Fg458f34",
+  },
+  "Asm5xK": {
+    longURL: "http://www.google.com",
+    userID: "Fg458f34",
+  },
+  "h65fe0": {
+    longURL: "http://www.reddit.com",
+    userID: "nk457fqp"
+  }
 };
 
 //User database
@@ -108,7 +118,10 @@ app.post("/urls", (req, res) => {
   const clientUserId = clientCookie.user_id;
   if(clientUserId) {
     const randomString = generateRandomString(6);
-    urlDatabase[randomString] = `http://${req.body.longURL}`;
+    urlDatabase[randomString] = {
+      longURL: `http://${req.body.longURL}`,
+      userID: clientUserId
+    };
     return res.redirect(`/urls/${randomString}`);
   }
   res.status(401).send("User login required to access services");
@@ -117,7 +130,7 @@ app.post("/urls", (req, res) => {
 //Renders the urls_show page and lists the requested short and long URL
 app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
-  const longURL = urlDatabase[shortURL];
+  const longURL = urlDatabase[shortURL].longURL;
   const clientCookie = req.cookies;
   const clientUserId = clientCookie.user_id;
   let user = "";
@@ -136,14 +149,16 @@ app.get("/urls/:shortURL", (req, res) => {
 app.post("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const newLongURL = `http://${req.body.newLongURL}`;
-  urlDatabase[shortURL] = newLongURL;
+  urlDatabase[shortURL].longURL = newLongURL;
   res.redirect(`/urls/${shortURL}`);
 });
 
 //Redirects to the long URL website when the short URL link is clicked
 app.get("/u/:shortURL", (req, res) =>{
   const shortURL = req.params.shortURL
-  res.redirect(`${urlDatabase[shortURL]}`)
+  const shortUrlArray = Object.keys(urlDatabase);
+  if (shortUrlArray.includes(shortURL)) return res.redirect(`${urlDatabase[shortURL].longURL}`);
+  res.status(406).send("Cannot find referenced URL");
 });
 
 //POST request to delete URL stored in the URL database
@@ -225,8 +240,7 @@ app.post("/logout", (req, res) => {
 //##TESTS AND TEST ENPOINTS##
 app.get("/test", (req, res) => {
   // console.log(JSON.stringify(usersDatabase, 0, 2));
-  // console.log(JSON.stringify(urlDatabase, 0, 2));
-  console.log(lookupUserByEmail("user@example.com", usersDatabase));
+  console.log(JSON.stringify(urlDatabase, 0, 2));
   res.status(400).send("Error");
 });
 
