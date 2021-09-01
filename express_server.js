@@ -35,6 +35,20 @@ const urlDatabase = {
   "Asm5xK": "http://www.google.com"
 };
 
+//User database
+const usersDatabase= { 
+  "userRandomID": {
+    id: "userRandomID", 
+    email: "user@example.com", 
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID", 
+    email: "user2@example.com", 
+    password: "dishwasher-funk"
+  }
+}
+
 
 //##ENDPOINTS/ROUTES BELOW##
 
@@ -129,6 +143,21 @@ app.get("/register", (req, res) => {
   res.render("urls_register", templateVars)
 });
 
+//POST request for new user registration
+app.post("/register", (req, res) => {
+  const userEmail = req.body.email;
+  const userPassword = req.body.password;
+  const randomString = generateRandomString(8);
+  usersDatabase[randomString] = {
+    id: randomString,
+    email: userEmail,
+    password: userPassword
+  };
+  res.cookie("user_id", randomString);
+  console.log(JSON.stringify(usersDatabase, 0, 2));
+  res.redirect("/urls");
+});
+
 //Sends the URL database in JSON to the client
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
@@ -141,7 +170,7 @@ app.get("/hello", (req, res) => {
 
 
 
-//Server listeneing to PORT
+//Server listening to PORT
 app.listen(PORT, () => {
   console.log("Server is listening on port", PORT);
 });
