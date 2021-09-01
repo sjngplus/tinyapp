@@ -28,8 +28,9 @@
     </div>
     <% } else { %> 
       <div>
-        <form class="form-check form-check-inline" action="/logout" method="POST">
+        <form class="form-inline" action="/logout" method="POST">
           <div class="form-group mb-2">
+            <p style="font-weight: 450; margin: 5px; margin-right: 20px;">Logged In As: <%= user.email %>!</p>
             <button type="submit" class="btn btn-primary">Logout</button>
           </div>
         </form>

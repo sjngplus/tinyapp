@@ -142,12 +142,6 @@ app.post(`/urls/:shortURL/delete`, (req, res) => {
   res.redirect("/urls/");
 });
 
-//POST request for user logout
-app.post("/logout", (req, res) => {
-  res.clearCookie("user_id");
-  res.redirect("/urls");
-});
-
 //Renders the user registration page
 app.get("/register", (req, res) => {
   const clientCookie = req.cookies;
@@ -195,6 +189,23 @@ app.get("/login", (req, res) => {
     user
   };
   res.render("urls_login", templateVars);
+});
+
+//POST request for user login
+app.post("/login", (req, res) => {
+  const email = req.body.email;
+  const password = req.body.password;
+  const user = lookupUserByEmail(email, usersDatabase);
+  if (!user) return res.status(403).send("Invalid email or password");
+  if (password !== user.password) return res.status(403).send("Invalid email or password");
+  res.cookie("user_id", user.id);
+  res.redirect("/urls");
+});
+
+//POST request for user logout
+app.post("/logout", (req, res) => {
+  res.clearCookie("user_id");
+  res.redirect("/urls");
 });
 
 
