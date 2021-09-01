@@ -18,7 +18,18 @@ const lookupUserByEmail = function(email, database) {
   }
   return false;
 };
-
+// Returns the urls that belong to userID
+const urlsForUserID = function(userID, database) {
+  let result = {};
+  for (let shortUrlKey in database) {
+    if (userID === database[shortUrlKey].userID) {
+      result[shortUrlKey] = {
+        longURL: database[shortUrlKey].longURL        
+      }
+    }
+  }
+  return result;
+};
 
 //Setting up the express server
 const express = require('express');
@@ -65,7 +76,7 @@ const usersDatabase= {
  "f56g23kl": {
     id: "f56g23kl", 
     email: "user2@example.com", 
-    password: "dishwasher-funk"
+    password: "test2"
   },
   "nk457fqp": {
     id: "nk457fqp",
@@ -85,13 +96,14 @@ app.get("/", (req, res) => {
 //Renders all URL lists in the database
 app.get("/urls", (req, res) => {
   const clientCookie = req.cookies;
-  const clientUserId = clientCookie.user_id
+  const clientUserId = clientCookie.user_id;
+  const usersUrls = urlsForUserID(clientUserId, urlDatabase);
   let user = "";
   if (clientUserId) {
     user = usersDatabase[clientUserId];
   }
   const templateVars = {
-    urls: urlDatabase,
+    urls: usersUrls,
     user
   };
   res.render("urls_index", templateVars);
@@ -129,10 +141,16 @@ app.post("/urls", (req, res) => {
 
 //Renders the urls_show page and lists the requested short and long URL
 app.get("/urls/:shortURL", (req, res) => {
-  const shortURL = req.params.shortURL;
-  const longURL = urlDatabase[shortURL].longURL;
   const clientCookie = req.cookies;
   const clientUserId = clientCookie.user_id;
+  let shortURL = req.params.shortURL;
+  let longURL = urlDatabase[shortURL].longURL;
+  const usersUrls = urlsForUserID(clientUserId, urlDatabase);
+  const userUrlsKeysArr = Object.keys(usersUrls);
+  if (!userUrlsKeysArr.includes(shortURL)) {
+    shortURL = "";
+    longURL = "";
+  }
   let user = "";
   if (clientUserId) {
     user = usersDatabase[clientUserId];
@@ -147,6 +165,8 @@ app.get("/urls/:shortURL", (req, res) => {
 
 //POST request to update an existing longURL in the URL database
 app.post("/urls/:shortURL", (req, res) => {
+  const clientCookie = req.cookies;
+  const clientUserId = clientCookie.user_id;
   const shortURL = req.params.shortURL;
   const newLongURL = `http://${req.body.newLongURL}`;
   urlDatabase[shortURL].longURL = newLongURL;
@@ -241,6 +261,7 @@ app.post("/logout", (req, res) => {
 app.get("/test", (req, res) => {
   // console.log(JSON.stringify(usersDatabase, 0, 2));
   console.log(JSON.stringify(urlDatabase, 0, 2));
+  console.log(urlsForUserID("nk457fqp", urlDatabase));
   res.status(400).send("Error");
 });
 

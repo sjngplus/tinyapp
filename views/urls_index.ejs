@@ -16,25 +16,29 @@
 
   <main style="margin: 1em;">
     <h3>My URLs</h3>
-    <table class="table">
-      <thead>
-        <tr>
-          <th scope="col">Short URL</th>
-          <th scope="col">Long URL</th>
-          <th scope="col">Edit</th>
-          <th scope="col">DELETE</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% for(let url in urls) { %>
+    <% if (user) { %> 
+      <table class="table">
+        <thead>
           <tr>
-            <td><%= url %></td>
-            <td><%= urls[url].longURL %></td>
-            <td><form method="GET" action="/urls/<%=url%>/"><button style="color: royalblue; background-color: white; border-color: royalblue; border-radius: 5px; border-style: solid; border-width: 1.5px;">Edit</button></form></td>
-            <td><form method="POST" action="/urls/<%=url%>/delete"><button style="color: crimson; background-color: white; border-color: crimson; border-radius: 5px; border-style: solid; border-width: 1.5px;">Delete</button></form></td>
+            <th scope="col">Short URL</th>
+            <th scope="col">Long URL</th>
+            <th scope="col">Edit</th>
+            <th scope="col">DELETE</th>
           </tr>
-        <% } %>
-    </table>
+        </thead>
+        <tbody>
+          <% for(let url in urls) { %>
+            <tr>
+              <td><%= url %></td>
+              <td><%= urls[url].longURL %></td>
+              <td><form method="GET" action="/urls/<%=url%>/"><button style="color: royalblue; background-color: white; border-color: royalblue; border-radius: 5px; border-style: solid; border-width: 1.5px;">Edit</button></form></td>
+              <td><form method="POST" action="/urls/<%=url%>/delete"><button style="color: crimson; background-color: white; border-color: crimson; border-radius: 5px; border-style: solid; border-width: 1.5px;">Delete</button></form></td>
+            </tr>
+          <% } %>
+      </table>
+    <% } else { %> 
+        <p>Please login to view your saved URLs</p>
+    <% } %> 
   </main>
   
   <!-- Bootstrap JS -->
