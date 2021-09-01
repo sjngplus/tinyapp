@@ -142,13 +142,6 @@ app.post(`/urls/:shortURL/delete`, (req, res) => {
   res.redirect("/urls/");
 });
 
-//POST request for user login
-app.post("/logins", (req, res) => {
-  const userName = req.body.username;
-  res.cookie("username", userName);
-  res.redirect("/urls");
-});
-
 //POST request for user logout
 app.post("/logout", (req, res) => {
   res.clearCookie("user_id");
