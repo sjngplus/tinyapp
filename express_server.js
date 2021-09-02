@@ -30,6 +30,12 @@ const urlsForUserID = function(userID, database) {
   }
   return result;
 };
+//Checks if given url belongs to user
+const doesUrlBelongToUser = function(url, userID, database) {
+  const usersUrls = urlsForUserID(userID, database);
+  const userUrlsKeysArr = Object.keys(usersUrls);
+  return userUrlsKeysArr.includes(url)
+};
 
 //Setting up the express server
 const express = require('express');
@@ -144,17 +150,15 @@ app.get("/urls/:shortURL", (req, res) => {
   const clientCookie = req.cookies;
   const clientUserId = clientCookie.user_id;
   let shortURL = req.params.shortURL;
-  let longURL = urlDatabase[shortURL].longURL;
-  const usersUrls = urlsForUserID(clientUserId, urlDatabase);
-  const userUrlsKeysArr = Object.keys(usersUrls);
-  if (!userUrlsKeysArr.includes(shortURL)) {
+  let longURL = urlDatabase[shortURL].longURL;  
+  if (!doesUrlBelongToUser(shortURL, clientUserId, urlDatabase)) {
     shortURL = "";
     longURL = "";
   }
   let user = "";
   if (clientUserId) {
     user = usersDatabase[clientUserId];
-  } 
+  }
   const templateVars = { 
     shortURL, 
     longURL,
@@ -163,12 +167,14 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+
 //POST request to update an existing longURL in the URL database
 app.post("/urls/:shortURL", (req, res) => {
   const clientCookie = req.cookies;
   const clientUserId = clientCookie.user_id;
-  if (clientUserId) {
-    const shortURL = req.params.shortURL;
+  const shortURL = req.params.shortURL;
+  const usersUrls = urlsForUserID(clientUserId, urlDatabase);
+  if (clientUserId && doesUrlBelongToUser(shortURL, clientUserId, urlDatabase)) {
     const newLongURL = `http://${req.body.newLongURL}`;
     urlDatabase[shortURL].longURL = newLongURL;
     return res.redirect(`/urls/${shortURL}`);
@@ -188,7 +194,7 @@ app.get("/u/:shortURL", (req, res) =>{
 app.post(`/urls/:shortURL/delete`, (req, res) => {
   const clientCookie = req.cookies;
   const clientUserId = clientCookie.user_id;
-  if (clientUserId) {
+  if (clientUserId && doesUrlBelongToUser(shortURL, clientUserId, urlDatabase)) {
     const shortURL = req.params.shortURL
     delete urlDatabase[shortURL];
     return res.redirect("/urls/");
