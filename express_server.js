@@ -7,9 +7,6 @@ const {
 } = require('./helper_functions');
 
 
-
-
-
 //Setting up the express server
 const express = require('express');
 const app = express();
