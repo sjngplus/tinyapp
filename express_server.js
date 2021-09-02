@@ -1,8 +1,8 @@
 //Importing helper functions
 const {
-  lookupUserByEmail, 
-  generateRandomString, 
-  urlsForUserID, 
+  lookupUserByEmail,
+  generateRandomString,
+  urlsForUserID,
   doesUrlBelongToUser
 } = require('./helper_functions');
 
@@ -28,35 +28,8 @@ app.use(cookie({
   keys: ["keyz1", "keyzz2"]
 }));
 
-//URL database
-const urlDatabase = {
-  "b2xVn2": {
-    longURL: "http://www.lighthouselabs.ca",
-    userID: "PZ6AK3dT",
-  },
-  "Asm5xK": {
-    longURL: "http://www.google.com",
-    userID: "PZ6AK3dT",
-  },
-  "h65fe0": {
-    longURL: "http://www.reddit.com",
-    userID: "cZdQWCde"
-  }
-};
-
-//User database
-const usersDatabase= {     
-  "cZdQWCde": {
-    id: "cZdQWCde",
-    email: "testzzzz@example.com",
-    password: "$2a$10$Rlzoo1muiqTIJvgEmhOd3uht7kOurcj8slZZdLj01e8Qbmhdnh0MW"
-  },
-  "PZ6AK3dT": {
-    "id": "PZ6AK3dT",
-    "email": "test@example.com",
-    "password": "$2a$10$UtV2uCYR6BV4RfK/GEnrAOLt/MbfKvnm9fGVTAAekvXnL1fTEj5TC"
-  }
-}
+//Importing databases
+const {urlDatabase, usersDatabase} = require('./databases');
 
 
 //##ENDPOINTS/ROUTES BELOW##
@@ -68,10 +41,7 @@ app.get("/", (req, res) => {
 
 //Renders all URL lists in the database
 app.get("/urls", (req, res) => {
-  let clientUserId;
-  if (req.session) {
-    clientUserId = req.session.user_id;  
-  }
+  const clientUserId = req.session.user_id;
   const usersUrls = urlsForUserID(clientUserId, urlDatabase);
   let user = "";
   if (clientUserId) {
@@ -86,10 +56,7 @@ app.get("/urls", (req, res) => {
 
 //Renders the create new page
 app.get("/urls/new", (req, res) => {
-  let clientUserId;
-  if (req.session) {
-    clientUserId = req.session.user_id;  
-  }
+  const clientUserId = req.session.user_id;
   let user = "";
   if (clientUserId) {
     user = usersDatabase[clientUserId];
@@ -103,11 +70,8 @@ app.get("/urls/new", (req, res) => {
 
 //A POST request to save a new short and long URL into the URL database
 app.post("/urls", (req, res) => {
-  let clientUserId;
-  if (req.session) {
-    clientUserId = req.session.user_id;  
-  }
-  if(clientUserId) {
+  const clientUserId = req.session.user_id;
+  if (clientUserId) {
     const randomString = generateRandomString(6);
     urlDatabase[randomString] = {
       longURL: `http://${req.body.longURL}`,
@@ -120,12 +84,9 @@ app.post("/urls", (req, res) => {
 
 //Renders the urls_show page and lists the requested short and long URL
 app.get("/urls/:shortURL", (req, res) => {
-  let clientUserId;
-  if (req.session) {
-    clientUserId = req.session.user_id;  
-  }
+  const clientUserId = req.session.user_id;
   let shortURL = req.params.shortURL;
-  let longURL = urlDatabase[shortURL].longURL;  
+  let longURL = urlDatabase[shortURL].longURL;
   if (!doesUrlBelongToUser(shortURL, clientUserId, urlDatabase)) {
     shortURL = "";
     longURL = "";
@@ -134,23 +95,19 @@ app.get("/urls/:shortURL", (req, res) => {
   if (clientUserId) {
     user = usersDatabase[clientUserId];
   }
-  const templateVars = { 
-    shortURL, 
+  const templateVars = {
+    shortURL,
     longURL,
     user
-  }
+  };
   res.render("urls_show", templateVars);
 });
 
 
 //POST request to update an existing longURL in the URL database
 app.post("/urls/:shortURL", (req, res) => {
-  let clientUserId;
-  if (req.session) {
-    clientUserId = req.session.user_id;  
-  }
+  const clientUserId = req.session.user_id;
   const shortURL = req.params.shortURL;
-  const usersUrls = urlsForUserID(clientUserId, urlDatabase);
   if (clientUserId && doesUrlBelongToUser(shortURL, clientUserId, urlDatabase)) {
     const newLongURL = `http://${req.body.newLongURL}`;
     urlDatabase[shortURL].longURL = newLongURL;
@@ -161,7 +118,7 @@ app.post("/urls/:shortURL", (req, res) => {
 
 //Redirects to the long URL website when the short URL link is clicked
 app.get("/u/:shortURL", (req, res) =>{
-  const shortURL = req.params.shortURL
+  const shortURL = req.params.shortURL;
   const shortUrlArray = Object.keys(urlDatabase);
   if (shortUrlArray.includes(shortURL)) return res.redirect(`${urlDatabase[shortURL].longURL}`);
   res.status(406).send("Cannot find referenced URL");
@@ -169,11 +126,8 @@ app.get("/u/:shortURL", (req, res) =>{
 
 //POST request to delete URL stored in the URL database
 app.post(`/urls/:shortURL/delete`, (req, res) => {
-  let clientUserId;
-  if (req.session) {
-    clientUserId = req.session.user_id;  
-  }
-  const shortURL = req.params.shortURL
+  const clientUserId = req.session.user_id;
+  const shortURL = req.params.shortURL;
   if (clientUserId && doesUrlBelongToUser(shortURL, clientUserId, urlDatabase)) {
     delete urlDatabase[shortURL];
     return res.redirect("/urls/");
@@ -183,10 +137,7 @@ app.post(`/urls/:shortURL/delete`, (req, res) => {
 
 //Renders the user registration page
 app.get("/register", (req, res) => {
-  let clientUserId;
-  if (req.session) {
-    clientUserId = req.session.user_id;  
-  }
+  const clientUserId = req.session.user_id;
   let user = "";
   if (clientUserId) {
     user = usersDatabase[clientUserId];
@@ -194,7 +145,7 @@ app.get("/register", (req, res) => {
   const templateVars = {
     user
   };
-  res.render("urls_register", templateVars)
+  res.render("urls_register", templateVars);
 });
 
 //POST request for new user registration
@@ -207,7 +158,7 @@ app.post("/register", (req, res) => {
   const hashedPassword = bcrypt.hashSync(plainTextPassword, 10);
   const userInDatabase = lookupUserByEmail(newUserEmail, usersDatabase);
   if (userInDatabase) {
-    return res.status(400).send("Email is registered already. Please use new email")
+    return res.status(400).send("Email is registered already. Please use new email");
   }
   const randomString = generateRandomString(8);
   usersDatabase[randomString] = {
@@ -221,10 +172,7 @@ app.post("/register", (req, res) => {
 
 //Renders the user login page
 app.get("/login", (req, res) => {
-  let clientUserId;
-  if (req.session) {
-    clientUserId = req.session.user_id;  
-  }
+  const clientUserId = req.session.user_id;
   let user = "";
   if (clientUserId) {
     user = usersDatabase[clientUserId];
