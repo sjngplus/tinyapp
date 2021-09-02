@@ -48,10 +48,13 @@ const PORT = 8080;
 // const morgan = require('morgan');
 // app.use(morgan('short'));
 
+//Importing bcryptjs for password encryption
+const bcrypt = require('bcryptjs');
+
 //Setting the view engine to ejs.
 app.set('view engine', 'ejs');
 
-//Replaces body-parser. Middleware to parse client form requests/data
+//Replaces body-parser. To parse client form requests/data
 app.use(express.urlencoded({extended: true}));
 
 //Setting up cookie-parser middleware to use cookies
@@ -90,7 +93,12 @@ const usersDatabase= {
     id: "nk457fqp",
     email: "test@example.com",
     password: "test"
-  } 
+  },
+  "cZdQWCde": {
+    id: "cZdQWCde",
+    email: "testzzzz@example.com",
+    password: "$2a$10$Rlzoo1muiqTIJvgEmhOd3uht7kOurcj8slZZdLj01e8Qbmhdnh0MW"
+  }
 }
 
 
@@ -221,10 +229,11 @@ app.get("/register", (req, res) => {
 //POST request for new user registration
 app.post("/register", (req, res) => {
   const newUserEmail = req.body.email;
-  const newUserPassword = req.body.password;
-  if (!newUserEmail || !newUserPassword) {
+  const plainTextPassword = req.body.password;
+  if (!newUserEmail || !plainTextPassword) {
     return res.status(400).send("Please enter valid credentials");
   }
+  const hashedPassword = bcrypt.hashSync(plainTextPassword, 10);
   const userInDatabase = lookupUserByEmail(newUserEmail, usersDatabase);
   if (userInDatabase) {
     return res.status(400).send("Email is registered already. Please use new email")
@@ -233,7 +242,7 @@ app.post("/register", (req, res) => {
   usersDatabase[randomString] = {
     id: randomString,
     email: newUserEmail,
-    password: newUserPassword
+    password: hashedPassword
   };
   res.cookie("user_id", randomString);
   res.redirect("/urls");
@@ -259,7 +268,7 @@ app.post("/login", (req, res) => {
   const password = req.body.password;
   const user = lookupUserByEmail(email, usersDatabase);
   if (!user) return res.status(403).send("Invalid email or password");
-  if (password !== user.password) return res.status(403).send("Invalid email or password");
+  if (!bcrypt.compareSync(password, user.password)) return res.status(403).send("Invalid email or password");
   res.cookie("user_id", user.id);
   res.redirect("/urls");
 });
@@ -275,10 +284,9 @@ app.post("/logout", (req, res) => {
 
 //##TESTS AND TEST ENPOINTS##
 app.get("/test", (req, res) => {
-  // console.log(JSON.stringify(usersDatabase, 0, 2));
-  console.log(JSON.stringify(urlDatabase, 0, 2));
-  console.log(urlsForUserID("nk457fqp", urlDatabase));
-  res.status(400).send("Error");
+  console.log(JSON.stringify(usersDatabase, 0, 2));
+  // console.log(JSON.stringify(urlDatabase, 0, 2));
+  res.status(400).send("Testpage");
 });
 
 app.get("/urlDatabase.json", (req, res) => {
