@@ -1,4 +1,5 @@
 //##HELPER FUNCTIONS##
+const {lookupUserByEmail} = require('./helper_functions');
 //Generate a randomstring of x length
 const generateRandomString = function(stringLength) {
   let result = '';
@@ -9,15 +10,7 @@ const generateRandomString = function(stringLength) {
   }
   return result;
 };
-//Check for existing email and return user info
-const lookupUserByEmail = function(email, database) {
-  for (const user in database) {
-    if (email === database[user].email) {
-      return database[user];
-    }
-  }
-  return false;
-};
+
 // Returns the urls that belong to userID
 const urlsForUserID = function(userID, database) {
   let result = {};
@@ -36,8 +29,6 @@ const doesUrlBelongToUser = function(url, userID, database) {
   const userUrlsKeysArr = Object.keys(usersUrls);
   return userUrlsKeysArr.includes(url)
 };
-
-
 
 //Setting up the express server
 const express = require('express');
