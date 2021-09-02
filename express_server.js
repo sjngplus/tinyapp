@@ -37,6 +37,8 @@ const doesUrlBelongToUser = function(url, userID, database) {
   return userUrlsKeysArr.includes(url)
 };
 
+
+
 //Setting up the express server
 const express = require('express');
 const app = express();
@@ -194,8 +196,8 @@ app.get("/u/:shortURL", (req, res) =>{
 app.post(`/urls/:shortURL/delete`, (req, res) => {
   const clientCookie = req.cookies;
   const clientUserId = clientCookie.user_id;
+  const shortURL = req.params.shortURL
   if (clientUserId && doesUrlBelongToUser(shortURL, clientUserId, urlDatabase)) {
-    const shortURL = req.params.shortURL
     delete urlDatabase[shortURL];
     return res.redirect("/urls/");
   }
