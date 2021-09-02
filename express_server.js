@@ -12,10 +12,6 @@ const express = require('express');
 const app = express();
 const PORT = 8080;
 
-// morgan middleware allows to log the request in the terminal
-// const morgan = require('morgan');
-// app.use(morgan('short'));
-
 //Importing bcryptjs for password encryption
 const bcrypt = require('bcryptjs');
 
@@ -24,10 +20,6 @@ app.set('view engine', 'ejs');
 
 //Replaces body-parser. To parse client form requests/data
 app.use(express.urlencoded({extended: true}));
-
-// //Setting up cookie-parser middleware to use cookies. Replaced by cookie-session.
-// const cookie = require('cookie-parser');
-// app.use(cookie());
 
 //Setting up cookie-session middleware to use encrypted cookies. Replaces cookie-parser.
 const cookie = require('cookie-session');
@@ -260,9 +252,15 @@ app.post("/logout", (req, res) => {
   res.redirect("/urls");
 });
 
+//Server listening to PORT
+app.listen(PORT, () => {
+  console.log("Server is listening on port", PORT);
+});
 
 
 
+
+//vvvvv##REMOVE BEFORE FINAL PROJECT SUBMISSION!!##vvvvv
 //##TESTS AND TEST ENPOINTS##
 app.get("/test", (req, res) => {
   console.log(JSON.stringify(usersDatabase, 0, 2));
@@ -278,8 +276,6 @@ app.get("/usersDatabase.json", (req, res) => {
   res.json(usersDatabase);
 });
 
-
-//Server listening to PORT
-app.listen(PORT, () => {
-  console.log("Server is listening on port", PORT);
-});
+// morgan middleware allows to log the request in the terminal
+// const morgan = require('morgan');
+// app.use(morgan('short'));
