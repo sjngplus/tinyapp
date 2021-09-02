@@ -57,47 +57,44 @@ app.set('view engine', 'ejs');
 //Replaces body-parser. To parse client form requests/data
 app.use(express.urlencoded({extended: true}));
 
-//Setting up cookie-parser middleware to use cookies
-const cookie = require('cookie-parser');
-app.use(cookie());
+// //Setting up cookie-parser middleware to use cookies. Replaced by cookie-session.
+// const cookie = require('cookie-parser');
+// app.use(cookie());
+
+//Setting up cookie-session middleware to use encrypted cookies. Replaces cookie-parser.
+const cookie = require('cookie-session');
+app.use(cookie({
+  name: "session",
+  keys: ["keyz1", "keyzz2"]
+}));
 
 //URL database
 const urlDatabase = {
   "b2xVn2": {
     longURL: "http://www.lighthouselabs.ca",
-    userID: "Fg458f34",
+    userID: "PZ6AK3dT",
   },
   "Asm5xK": {
     longURL: "http://www.google.com",
-    userID: "Fg458f34",
+    userID: "PZ6AK3dT",
   },
   "h65fe0": {
     longURL: "http://www.reddit.com",
-    userID: "nk457fqp"
+    userID: "cZdQWCde"
   }
 };
 
 //User database
-const usersDatabase= { 
-  "Fg458f34": {
-    id: "Fg458f34", 
-    email: "user@example.com", 
-    password: "purple-monkey-dinosaur"
-  },
- "f56g23kl": {
-    id: "f56g23kl", 
-    email: "user2@example.com", 
-    password: "test2"
-  },
-  "nk457fqp": {
-    id: "nk457fqp",
-    email: "test@example.com",
-    password: "test"
-  },
+const usersDatabase= {     
   "cZdQWCde": {
     id: "cZdQWCde",
     email: "testzzzz@example.com",
     password: "$2a$10$Rlzoo1muiqTIJvgEmhOd3uht7kOurcj8slZZdLj01e8Qbmhdnh0MW"
+  },
+  "PZ6AK3dT": {
+    "id": "PZ6AK3dT",
+    "email": "test@example.com",
+    "password": "$2a$10$UtV2uCYR6BV4RfK/GEnrAOLt/MbfKvnm9fGVTAAekvXnL1fTEj5TC"
   }
 }
 
@@ -111,8 +108,10 @@ app.get("/", (req, res) => {
 
 //Renders all URL lists in the database
 app.get("/urls", (req, res) => {
-  const clientCookie = req.cookies;
-  const clientUserId = clientCookie.user_id;
+  let clientUserId;
+  if (req.session) {
+    clientUserId = req.session.user_id;  
+  }
   const usersUrls = urlsForUserID(clientUserId, urlDatabase);
   let user = "";
   if (clientUserId) {
@@ -127,8 +126,10 @@ app.get("/urls", (req, res) => {
 
 //Renders the create new page
 app.get("/urls/new", (req, res) => {
-  const clientCookie = req.cookies;
-  const clientUserId = clientCookie.user_id
+  let clientUserId;
+  if (req.session) {
+    clientUserId = req.session.user_id;  
+  }
   let user = "";
   if (clientUserId) {
     user = usersDatabase[clientUserId];
@@ -142,8 +143,10 @@ app.get("/urls/new", (req, res) => {
 
 //A POST request to save a new short and long URL into the URL database
 app.post("/urls", (req, res) => {
-  const clientCookie = req.cookies;
-  const clientUserId = clientCookie.user_id;
+  let clientUserId;
+  if (req.session) {
+    clientUserId = req.session.user_id;  
+  }
   if(clientUserId) {
     const randomString = generateRandomString(6);
     urlDatabase[randomString] = {
@@ -157,8 +160,10 @@ app.post("/urls", (req, res) => {
 
 //Renders the urls_show page and lists the requested short and long URL
 app.get("/urls/:shortURL", (req, res) => {
-  const clientCookie = req.cookies;
-  const clientUserId = clientCookie.user_id;
+  let clientUserId;
+  if (req.session) {
+    clientUserId = req.session.user_id;  
+  }
   let shortURL = req.params.shortURL;
   let longURL = urlDatabase[shortURL].longURL;  
   if (!doesUrlBelongToUser(shortURL, clientUserId, urlDatabase)) {
@@ -180,8 +185,10 @@ app.get("/urls/:shortURL", (req, res) => {
 
 //POST request to update an existing longURL in the URL database
 app.post("/urls/:shortURL", (req, res) => {
-  const clientCookie = req.cookies;
-  const clientUserId = clientCookie.user_id;
+  let clientUserId;
+  if (req.session) {
+    clientUserId = req.session.user_id;  
+  }
   const shortURL = req.params.shortURL;
   const usersUrls = urlsForUserID(clientUserId, urlDatabase);
   if (clientUserId && doesUrlBelongToUser(shortURL, clientUserId, urlDatabase)) {
@@ -202,8 +209,10 @@ app.get("/u/:shortURL", (req, res) =>{
 
 //POST request to delete URL stored in the URL database
 app.post(`/urls/:shortURL/delete`, (req, res) => {
-  const clientCookie = req.cookies;
-  const clientUserId = clientCookie.user_id;
+  let clientUserId;
+  if (req.session) {
+    clientUserId = req.session.user_id;  
+  }
   const shortURL = req.params.shortURL
   if (clientUserId && doesUrlBelongToUser(shortURL, clientUserId, urlDatabase)) {
     delete urlDatabase[shortURL];
@@ -214,8 +223,10 @@ app.post(`/urls/:shortURL/delete`, (req, res) => {
 
 //Renders the user registration page
 app.get("/register", (req, res) => {
-  const clientCookie = req.cookies;
-  const clientUserId = clientCookie.user_id
+  let clientUserId;
+  if (req.session) {
+    clientUserId = req.session.user_id;  
+  }
   let user = "";
   if (clientUserId) {
     user = usersDatabase[clientUserId];
@@ -244,14 +255,16 @@ app.post("/register", (req, res) => {
     email: newUserEmail,
     password: hashedPassword
   };
-  res.cookie("user_id", randomString);
+  req.session.user_id = randomString;
   res.redirect("/urls");
 });
 
 //Renders the user login page
 app.get("/login", (req, res) => {
-  const clientCookie = req.cookies;
-  const clientUserId = clientCookie.user_id
+  let clientUserId;
+  if (req.session) {
+    clientUserId = req.session.user_id;  
+  }
   let user = "";
   if (clientUserId) {
     user = usersDatabase[clientUserId];
@@ -269,13 +282,13 @@ app.post("/login", (req, res) => {
   const user = lookupUserByEmail(email, usersDatabase);
   if (!user) return res.status(403).send("Invalid email or password");
   if (!bcrypt.compareSync(password, user.password)) return res.status(403).send("Invalid email or password");
-  res.cookie("user_id", user.id);
+  req.session.user_id = user.id;
   res.redirect("/urls");
 });
 
 //POST request for user logout
 app.post("/logout", (req, res) => {
-  res.clearCookie("user_id");
+  req.session = null;
   res.redirect("/urls");
 });
 
