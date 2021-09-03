@@ -38,13 +38,13 @@ app.get("/", (req, res) => {
 app.get("/urls", (req, res) => {
   const clientUserId = req.session.user_id;
   const usersUrls = urlsForUserID(clientUserId, urlDatabase);
-  let user = "";
+  let userEmail = "";
   if (clientUserId) {
-    user = usersDatabase[clientUserId];
+    userEmail = usersDatabase[clientUserId].email;
   }
   const templateVars = {
     urls: usersUrls,
-    user
+    userEmail
   };
   res.render("urls_index", templateVars);
 });
@@ -52,11 +52,11 @@ app.get("/urls", (req, res) => {
 //Renders the create new page
 app.get("/urls/new", (req, res) => {
   const clientUserId = req.session.user_id;
-  let user = "";
+  let userEmail = "";
   if (clientUserId) {
-    user = usersDatabase[clientUserId];
+    userEmail = usersDatabase[clientUserId].email;
     const templateVars = {
-      user
+      userEmail
     };
     return res.render("urls_new", templateVars);
   }
@@ -86,14 +86,14 @@ app.get("/urls/:shortURL", (req, res) => {
     shortURL = "";
     longURL = "";
   }
-  let user = "";
+  let userEmail = "";
   if (clientUserId) {
-    user = usersDatabase[clientUserId];
+    userEmail = usersDatabase[clientUserId].email;
   }
   const templateVars = {
     shortURL,
     longURL,
-    user
+    userEmail
   };
   res.render("urls_show", templateVars);
 });
@@ -132,12 +132,12 @@ app.post(`/urls/:shortURL/delete`, (req, res) => {
 //Renders the user registration page
 app.get("/register", (req, res) => {
   const clientUserId = req.session.user_id;
-  let user = "";
+  let userEmail = "";
   if (clientUserId) {
-    user = usersDatabase[clientUserId];
+    userEmail = usersDatabase[clientUserId].email;
   }
   const templateVars = {
-    user
+    userEmail
   };
   res.render("urls_register", templateVars);
 });
@@ -167,12 +167,12 @@ app.post("/register", (req, res) => {
 //Renders the user login page
 app.get("/login", (req, res) => {
   const clientUserId = req.session.user_id;
-  let user = "";
+  let userEmail = "";
   if (clientUserId) {
-    user = usersDatabase[clientUserId];
+    userEmail = usersDatabase[clientUserId].email;
   }
   const templateVars = {
-    user
+    userEmail
   };
   res.render("urls_login", templateVars);
 });
