@@ -107,7 +107,7 @@ app.post("/urls/:shortURL", (req, res) => {
     urlDatabase[shortURL].longURL = newLongURL;
     return res.redirect(`/urls/${shortURL}`);
   }
-  res.status(401).send("User login required to access services");
+  res.status(401).send(`<p style="font-family: sans-serif";"font-weight: 500">User login required to access services. <a style="font-style: italic" href="/login">Please login.</a></p>`);
 });
 
 //Redirects to the long URL website when the short URL link is clicked
@@ -115,7 +115,7 @@ app.get("/u/:shortURL", (req, res) =>{
   const shortURL = req.params.shortURL;
   const shortUrlArray = Object.keys(urlDatabase);
   if (shortUrlArray.includes(shortURL)) return res.redirect(`${urlDatabase[shortURL].longURL}`);
-  res.status(406).send("Cannot find referenced URL");
+  res.status(406).send(`<p style="font-family: sans-serif";"font-weight: 500">Cannot find referenced URL.</p>`);
 });
 
 //POST request to delete URL stored in the URL database
@@ -126,7 +126,7 @@ app.post(`/urls/:shortURL/delete`, (req, res) => {
     delete urlDatabase[shortURL];
     return res.redirect("/urls/");
   }
-  res.status(401).send("User login required to access services");
+  res.status(401).send(`<p style="font-family: sans-serif";"font-weight: 500">User login required to access services. <a style="font-style: italic" href="/login">Please login.</a></p>`);
 });
 
 //Renders the user registration page
@@ -147,12 +147,12 @@ app.post("/register", (req, res) => {
   const newUserEmail = req.body.email;
   const plainTextPassword = req.body.password;
   if (!newUserEmail || !plainTextPassword) {
-    return res.status(400).send("Please enter valid credentials");
+    return res.status(400).send(`<p style="font-family: sans-serif";"font-weight: 500">Please enter valid credentials. <a style="font-style: italic" href="/register">Please try again.</a></p>`);
   }
   const hashedPassword = bcrypt.hashSync(plainTextPassword, SALT);
   const userInDatabase = lookupUserByEmail(newUserEmail, usersDatabase);
   if (userInDatabase) {
-    return res.status(400).send("Email is registered already. Please use new email");
+    return res.status(400).send(`<p style="font-family: sans-serif";"font-weight: 500">Email is registered already. Please use new email. <a style="font-style: italic" href="/register">Please try again.</a></p>`);
   }
   const randomString = generateRandomString(8);
   usersDatabase[randomString] = {
@@ -182,8 +182,8 @@ app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   const user = lookupUserByEmail(email, usersDatabase);
-  if (!user) return res.status(403).send("Invalid email or password");
-  if (!bcrypt.compareSync(password, user.password)) return res.status(403).send("Invalid email or password");
+  if (!user) return res.status(403).send(`<p style="font-family: sans-serif";"font-weight: 500">Invalid email or password. <a style="font-style: italic" href="/login">Please try again.</a></p>`);
+  if (!bcrypt.compareSync(password, user.password)) return res.status(403).send(`<p style="font-family: sans-serif";"font-weight: 500">Invalid email or password. <a style="font-style: italic" href="/login">Please try again.</a></p>`);
   req.session.user_id = user.id;
   res.redirect("/urls");
 });
