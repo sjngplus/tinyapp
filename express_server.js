@@ -1,10 +1,5 @@
 //Importing helper functions
-const {
-  lookupUserByEmail,
-  generateRandomString,
-  urlsForUserID,
-  doesUrlBelongToUser
-} = require('./helper_functions');
+const { lookupUserByEmail, generateRandomString, urlsForUserID, doesUrlBelongToUser } = require('./helper_functions');
 
 //Setting up the express server
 const express = require('express');
@@ -30,8 +25,6 @@ app.use(cookie({
 
 //Importing databases
 const {urlDatabase, usersDatabase} = require('./databases');
-
-
 
 
 //##ENDPOINTS/ROUTES BELOW##
@@ -205,26 +198,3 @@ app.post("/logout", (req, res) => {
 app.listen(PORT, () => {
   console.log("Server is listening on port", PORT);
 });
-
-
-
-
-//vvvvv##REMOVE BEFORE FINAL PROJECT SUBMISSION!!##vvvvv
-//##TESTS AND TEST ENPOINTS##
-app.get("/test", (req, res) => {
-  console.log("User Database:", JSON.stringify(usersDatabase, 0, 2));
-  console.log("URL Database:", JSON.stringify(urlDatabase, 0, 2));
-  res.status(400).send("Testpage");
-});
-
-app.get("/urlDatabase.json", (req, res) => {
-  res.json(urlDatabase);
-});
-
-app.get("/usersDatabase.json", (req, res) => {
-  res.json(usersDatabase);
-});
-
-// morgan middleware allows to log the request in the terminal
-// const morgan = require('morgan');
-// app.use(morgan('short'));
