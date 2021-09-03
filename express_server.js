@@ -6,7 +6,6 @@ const {
   doesUrlBelongToUser
 } = require('./helper_functions');
 
-
 //Setting up the express server
 const express = require('express');
 const app = express();
@@ -14,6 +13,7 @@ const PORT = 8080;
 
 //Importing bcryptjs for password encryption
 const bcrypt = require('bcryptjs');
+const SALT = 10;
 
 //Setting the view engine to ejs.
 app.set('view engine', 'ejs');
@@ -30,6 +30,8 @@ app.use(cookie({
 
 //Importing databases
 const {urlDatabase, usersDatabase} = require('./databases');
+
+
 
 
 //##ENDPOINTS/ROUTES BELOW##
@@ -103,7 +105,6 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-
 //POST request to update an existing longURL in the URL database
 app.post("/urls/:shortURL", (req, res) => {
   const clientUserId = req.session.user_id;
@@ -155,7 +156,7 @@ app.post("/register", (req, res) => {
   if (!newUserEmail || !plainTextPassword) {
     return res.status(400).send("Please enter valid credentials");
   }
-  const hashedPassword = bcrypt.hashSync(plainTextPassword, 10);
+  const hashedPassword = bcrypt.hashSync(plainTextPassword, SALT);
   const userInDatabase = lookupUserByEmail(newUserEmail, usersDatabase);
   if (userInDatabase) {
     return res.status(400).send("Email is registered already. Please use new email");
@@ -211,8 +212,8 @@ app.listen(PORT, () => {
 //vvvvv##REMOVE BEFORE FINAL PROJECT SUBMISSION!!##vvvvv
 //##TESTS AND TEST ENPOINTS##
 app.get("/test", (req, res) => {
-  console.log(JSON.stringify(usersDatabase, 0, 2));
-  console.log(JSON.stringify(urlDatabase, 0, 2));
+  console.log("User Database:", JSON.stringify(usersDatabase, 0, 2));
+  console.log("URL Database:", JSON.stringify(urlDatabase, 0, 2));
   res.status(400).send("Testpage");
 });
 
