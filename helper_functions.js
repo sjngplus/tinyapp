@@ -39,11 +39,19 @@ const doesUrlBelongToUser = function(url, userID, database) {
   return userUrlsKeysArr.includes(url);
 };
 
-
+//Checks if url exists in the database
+const doesUrlExistInDatabase = function(shortUrl, database) {
+  let result = false;
+  for (const url in database) {
+    if (url === shortUrl) result = true;
+  }
+  return result;
+};
 
 module.exports = {
   lookupUserByEmail,
   generateRandomString,
   urlsForUserID,
-  doesUrlBelongToUser
+  doesUrlBelongToUser,
+  doesUrlExistInDatabase
 };

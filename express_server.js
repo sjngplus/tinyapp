@@ -1,5 +1,5 @@
 //Importing helper functions
-const { lookupUserByEmail, generateRandomString, urlsForUserID, doesUrlBelongToUser } = require('./helper_functions');
+const { lookupUserByEmail, generateRandomString, urlsForUserID, doesUrlBelongToUser, doesUrlExistInDatabase } = require('./helper_functions');
 
 //Setting up the express server
 const express = require('express');
@@ -81,6 +81,7 @@ app.post("/urls", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   const clientUserId = req.session.user_id;
   let shortURL = req.params.shortURL;
+  if (!doesUrlExistInDatabase(shortURL, urlDatabase)) return res.status(404).send(`<p style="font-family: sans-serif";"font-weight: 500">Cannot find referenced short URL.</p>`);
   let longURL = urlDatabase[shortURL].longURL;
   if (!doesUrlBelongToUser(shortURL, clientUserId, urlDatabase)) {
     shortURL = "";
